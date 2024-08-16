@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { StyledBox, StyledButton } from "./Wordle.Styled";
 import possibleWords from "./possibleWords";
 import { useRef } from "react";
+import Confetti from "react-confetti";
+import confetti from "canvas-confetti";
 
 const Wordle = () => {
   const [wordEntered, setWordEntered] = useState("");
   const [ramdomWordNew, setRamdomWordNew] = useState("");
 
-  //const [winner, setWinner] = useState(false);
+  const [winner, setWinner] = useState(false);
   const [infoChart, setInfoChart] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [maxLength, setMaxLength] = useState(0);
@@ -46,6 +48,7 @@ const Wordle = () => {
     setShouldPicOtherRamdomWord(true);
     setFirstTime(true);
     buttonRef.current.blur();
+    setWinner(false);
   };
 
   useEffect(() => {
@@ -57,8 +60,7 @@ const Wordle = () => {
         }
         if (wordEntered === ramdomWordNew) {
           console.log("YESSSSS they are equal");
-          //setWinner(true);
-          return;
+          setWinner(true);
         }
         const results = wordEntered.split("").map((entletter, entindex) => {
           if (entletter === ramdomWordNew[entindex]) {
@@ -69,7 +71,9 @@ const Wordle = () => {
             return 0;
           }
         });
-        console.log("results:", results);
+        if (results.includes(2)) {
+          confetti();
+        }
         setInfoChart((prev) => [
           ...prev,
           { word: wordEntered, result: results },
@@ -119,6 +123,8 @@ const Wordle = () => {
   return (
     <>
       <div className="box"></div>
+      {winner && <Confetti />}
+
       <div style={{ display: "flex", flexDirection: "column" }}>
         <ShowBoxes infoChart={infoChart} wordEntered={wordEntered} />
         <StyledButton
